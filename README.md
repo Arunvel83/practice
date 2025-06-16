@@ -10,7 +10,6 @@ ssh-keygen
 cd,cd .ssh/
 cat id_rsa.pub
 cd project-x
-
 git init
 
 jenkins 
