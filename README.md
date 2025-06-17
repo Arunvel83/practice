@@ -298,3 +298,31 @@ create peering request from nv to ohio
 accept in ohio
 NV route table connect public with 20.0.0.0/16
 ohio route table connect public with 10.0.0.0/16
+------------------
+
+     1yum update -y
+Search amazon cli …..
+    2  curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+    3  unzip awscliv2.zip
+    4  sudo ./aws/install
+    5  yum install python* -y
+    6  aws --version
+    7  aws configure
+Web repo sanjaygurujiii
+    8  sudo yum install automake fuse fuse-devel gcc-c++ git libcurl-devel libxml2-devel make openssl-devel
+    9  git clone https://github.com/s3fs-fuse/s3fs-fuse.git
+   10  ll
+Go to  s3fs-fuse
+./configure --prefix=/usr --with-openssl
+   15  cd s3fs-fuse
+   16  ll
+   17  cd autogen.sh
+   18  cd /autogen.sh
+   19  ./autogen.sh
+   20  ./configure --prefix=/usr --with-openssl
+   21  make install
+   22  cd ..
+   23  vim /etc/passwd-s3fs
+   24  sudo chmod 640 /etc/passwd-s3fs
+   25  s3fs devps59 /mnt -o passwd_file=/etc/passwd-s3fs
+   26  df -h
