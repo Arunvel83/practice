@@ -292,4 +292,9 @@ public of ohio
    16  ll
    17  cd
    18  ll
+before creating mnt
 connection peering from n.v to ohio
+create peering request from nv to ohio
+accept in ohio
+NV route table connect public with 20.0.0.0/16
+ohio route table connect public with 10.0.0.0/16
