@@ -178,6 +178,35 @@ ubuntu
     4  sudo mount -t nfs4 -o nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport 172.31.46.250:/ efs
     5  cd /root/efs
     6  ll
+
+------------------------------- to move vol one region to another
+create instance in mumbai
+create data vol 
+attach
+
+-connect instance
+sudo su -
+lsblk
+mkfs.ext4 /etc/sdb
+mkdir /data
+mount /dev/xvdb /data
+df -h
+cd /data
+touch devops.txt{1..100}
+ll
+
+go to snapshot there will be, if not create snap from vol then cpy change region to singapore
+
+-create instance in singapore
+-snapshot to vol
+-attach to instance
+lsblk
+mkdir /data
+mount /dev/xvdb /data
+df -h
+cd /data
+ll
+
 -------------------------------------------------nat gate
 
 vpc 1      }
@@ -207,7 +236,7 @@ subnet 2    }associate
 rt 2
 public sub with int gtw
 inst 2
-sg http 88, tcp 22, icmp
+sg http 88, ssh 22, icmp
 
 ohio
 
@@ -217,7 +246,7 @@ subnet 2    }associate
 rt 2
 public sub with int gtw
 inst 2
-sg http 88, tcp 22, icmp
+sg http 88, ssh 22, icmp
 
 public of north v terminal
 
