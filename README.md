@@ -497,6 +497,271 @@ spec:
       targetPort: 80
   type: LoadBalancer
 
-==============================================
+=======================terraform vpc=======================
+1  sudo dnf install -y dnf-plugins-core
+    2  sudo dnf config-manager --add-repo https://rpm.releases.hashicorp.com/AmazonLinux/hashicorp.repo
+    3  sudo dnf -y install terraform
+    4  terraform -v
+    5  curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+    6  unzip awscliv2.zip
+    7  sudo ./aws/install
+    8  aws configure
+    9  cd .aws/
+   10  ll
+   11  cat config
+   12  cat credentials
+   13  cd
+   14  mkdir terra
+   15  cd terra/
+   16  ll
+   17  vim ec2-vpc.tf
+   18  cd
+   19  ssh-keygen
+   20  cd .ssh/
+   21  ll
+   22  cat id_rsa.pub
+   23  cd
+   24  cd terra/
+   25  vim ec2-vpc.tf
+   26  terraform init
+   27  terraform fmt
+   28  terraform validate
+   29  terraform plan
+   30  terraform apply
+---------------------------------------------
+provider "aws" {
+  region = "us-east-1"
+ 
+}
+ 
+#This is VPC code
+ 
+resource "aws_vpc" "test-vpc" {
+  cidr_block = "10.0.0.0/16"
+}
+ 
+# this is Subnet code
+resource "aws_subnet" "public-subnet" {
+  vpc_id            = aws_vpc.test-vpc.id
+  availability_zone = "us-east-1b"
+  cidr_block        = "10.0.0.0/24"
+ 
+  tags = {
+    Name = "Public-subnet"
+  }
+}
+ 
+ 
+resource "aws_subnet" "private-subnet" {
+  vpc_id            = aws_vpc.test-vpc.id
+  availability_zone = "us-east-1b"
+  cidr_block        = "10.0.1.0/24"
+ 
+  tags = {
+    Name = "Private-subnet" #security group
+  }
+}
+ 
+resource "aws_security_group" "test_access" {
+  name        = "test_access"
+  vpc_id      = aws_vpc.test-vpc.id
+  description = "allow ssh and http"
+ 
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+ 
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+ 
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+ 
+ 
+}
+ 
+#security group end here#internet gateway code
+resource "aws_internet_gateway" "test-igw" {
+  vpc_id = aws_vpc.test-vpc.id
+ 
+  tags = {
+    Name = "test-igw"
+  }
+}
+ 
+ 
+#Public route table code
+ 
+resource "aws_route_table" "public-rt" {
+  vpc_id = aws_vpc.test-vpc.id
+ 
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gateway.test-igw.id
+  }
+ 
+ 
+  tags = {
+    Name = "public-rt"
+ 
+  }
+}
+#route Tatable assosication code
+resource "aws_route_table_association" "public-asso" {
+  subnet_id      = aws_subnet.public-subnet.id
+  route_table_id = aws_route_table.public-rt.id
+}
+ 
+#ec2 code
+resource "aws_instance" "sanjay-server" {
+  ami             = "ami-05ffe3c48a9991133"
+  subnet_id       = aws_subnet.public-subnet.id
+  instance_type   = "t2.micro"
+  security_groups = ["${aws_security_group.test_access.id}"]
+  key_name        = "nithya-key"
+  tags = {
+    Name     = "test-World"
+    Stage    = "testing"
+    Location = "chennai"
+  }
+ 
+}
+ 
+ 
+##create an EIP for EC2
+resource "aws_eip" "sanjay-ec2-eip" {
+  instance = aws_instance.sanjay-server.id
+}
+ 
+#ssh keypair code
+resource "aws_key_pair" "ltimindtree" {
+  key_name   = "nithya-new-key"
+  public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCvlb/dvHqB2JMM5s43uWgYsRlUz6eiEz6dX6JvLEZhrN1QbjSyfdsk8bagpohjxLhc2Y0nCD6RjsH5IuuMOEJ05h/KvKI539wEohH7irY7nefho3aVUUPmVlXeytSslIzpOX9CjM/Q4jQbxLMG7AgEEDRZwPyT3fQ3Z0iegKdkwO2R0S5hsyiGFL3gJmMfSn5Oumi20xtiik6L2pHjjN4xk8ozRYMJFVdBAq5a8OiKztqpCDKRMBOAPv46blzLFe5UES4TLIFEaMWXcLhVbdkkqpIO4l6DNq/0FkjR0tYJxghcy/M8TgZ0qqvQhtOQJxmsDL+DCWWZvjuEWJ6Fp8Sbqblo0iBE7DDW0icL+T++qQmjPAs5ODHMUeB67CUEdtFSUVFmhSaI19KpAVpzprbgxXYuFE+hS2bzFThpQriKBDJ6EytQXvRLy7zFigdC78VjQrUJap/JrKpGs1Xdrzqbebcv0N5cCgwivPLlnNimBHEx6AGWKwGucDKGPSVN5L8= root@terraform.example.com"
+}
+ 
+###this is database ec2 code
+resource "aws_instance" "database-server" {
+  ami             = "ami-05ffe3c48a9991133"
+  subnet_id       = aws_subnet.private-subnet.id
+  instance_type   = "t2.micro"
+  security_groups = ["${aws_security_group.test_access.id}"]
+  key_name        = "nithya-new-key"
+  tags = {
+    Name     = "db-World"
+    Stage    = "stage-base"
+    Location = "delhi"
+  }
+ 
+}
+ 
+##create a public ip for Nat gateway
+resource "aws_eip" "nat-eip" {
+}
+### create Nat gateway
+resource "aws_nat_gateway" "my-ngw" {
+  allocation_id = aws_eip.nat-eip.id
+  subnet_id     = aws_subnet.public-subnet.id
+}
+ 
+#create private route table
+resource "aws_route_table" "private-rt" {
+  vpc_id = aws_vpc.test-vpc.id
+ 
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_nat_gateway.my-ngw.id
+  }
+ 
+ 
+  tags = {
+    Name = "private-rt"
+  }
+}
+##route Tatable assosication code
+resource "aws_route_table_association" "private-asso" {
+  subnet_id      = aws_subnet.private-subnet.id
+  route_table_id = aws_route_table.private-rt.id
+}
+======================================================================================
+-----------browser display
+ 
+mkdir user-data
+   36  cd user-data
+   37  vim user-data
+   38  terraform init
+   39  terrafrom init
+   40  vim user-data
+   41  vim user-data.tf
+   42  terraform init
+   43  terraform fmt
+   44  terraform validate
+   45  terraform plan
+   46  terraform apply
+----------------------------------------------
+resource "aws_security_group" "web_access23" {
+  name        = "web_access23"
+  description = "Allow traffic"
+  tags = {
+    Name = "web_access23"
+  }
+}
+resource "aws_vpc_security_group_ingress_rule" "allow_http" {
+  security_group_id = aws_security_group.web_access23.id
+  cidr_ipv4         = "0.0.0.0/0"
+  from_port         = 80
+  ip_protocol       = "tcp"
+  to_port           = 80
+}
+resource "aws_vpc_security_group_ingress_rule" "allow_ssh" {
+  security_group_id = aws_security_group.web_access23.id
+  cidr_ipv4         = "0.0.0.0/0"
+  from_port         = 22
+  ip_protocol       = "tcp"
+  to_port           = 22
+}
+resource "aws_vpc_security_group_ingress_rule" "allow_https" {
+  security_group_id = aws_security_group.web_access23.id
+  cidr_ipv4         = "0.0.0.0/0"
+  from_port         = 443
+  ip_protocol       = "tcp"
+  to_port           = 443
+}
+resource "aws_vpc_security_group_egress_rule" "allow_all_taraffic" {
+  security_group_id = aws_security_group.web_access23.id
+  cidr_ipv4         = "0.0.0.0/0"
+  ip_protocol       = "-1"
+}
+#ec2 instance code starts here
+resource "aws_instance" "custom-server" {
+  ami               = "ami-05ffe3c48a9991133"
+  availability_zone = "us-east-1a"
+  instance_type     = "t2.micro"
+  security_groups   = ["${aws_security_group.web_access23.name}"]
+  key_name          = "Milestone-key"
 
+  user_data = <<-EOF
+        #!/bin/bash
+        sudo yum install httpd -y
+        sudo systemctl start httpd
+        sudo systemctl enable httpd
+        echo "<h1>custom  webserver using terraform</h1>" | sudo tee /var/www/html/index.html
+  EOF
+  tags = {
+    Name     = "hello-India"
+    Stage    = "testing"
+    Location = "India"
+  }
+}
+===========================================================================================================================
    
