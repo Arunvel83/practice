@@ -433,3 +433,70 @@ copy the ip and paste in the url
    10  cd /var/www/html
    11  ll
    12  cat index.html
+
+   ====================eks cluster nginx============
+    yum update -y
+    2  curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+    3   unzip awscliv2.zip
+    4  unzip awscliv2.zip
+    5  sudo ./aws/install
+    6  aws configure
+    7  curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
+    8  sudo mv /tmp/eksctl /usr/local/bin
+    9  eksctl version
+   10  curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
+   11  sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+   12  kubectl version --client
+   13   ssh-keygen
+   15  eksctl create cluster --name arunvel-2 --region us-east-1 --version 1.32 --node-type t2.small --nodes 3 --nodes-min 2 --nodes-max 4 --ssh-access --ssh-public-key /root/.ssh/id_rsa.pub
+   16  kubectl get nodes
+   17  kubectl get pod
+   18  vim nginx.yaml
+   20  kubectl apply -f nginx.yaml
+   21  kubectl get pod
+   22  vim service.yaml
+   23  kubectl apply -f service.yaml
+   24  kubectl get pod
+   25  kubectl get svc
+
+   -----vim nginx----
+
+   apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+  labels:
+    app: nginx
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:latest
+        ports:
+        - containerPort: 80
+-----vim service----
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-service
+spec:
+  selector:
+    app: nginx
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
+  type: LoadBalancer
+
+==============================================
+
+   
