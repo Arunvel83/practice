@@ -698,10 +698,6 @@ resource "aws_route_table_association" "private-asso" {
  
 mkdir user-data
    36  cd user-data
-   37  vim user-data
-   38  terraform init
-   39  terrafrom init
-   40  vim user-data
    41  vim user-data.tf
    42  terraform init
    43  terraform fmt
