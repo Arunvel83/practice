@@ -370,7 +370,20 @@ sudo su -
    37  cd /mnt
    38  vim sp.txt
    39  ll
-
+=================================nginx
+yum install nginx -y
+systemctl start nginx.service
+systemctl status nginx.service
+yum install docker*
+systemctl enable docker
+systemctl start docker
+docker pull nginx:stable-perl
+docker images
+docker run -itd --name MyBrowser -p 8080:8080 nginx /bin/bash
+docker ps -a
+docker attach img id
+curl http://localhost
+copy the ip and paste in the url
 
 
 =================================ansible
