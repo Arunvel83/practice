@@ -624,12 +624,12 @@ resource "aws_route_table_association" "public-asso" {
 }
  
 #ec2 code
-resource "aws_instance" "sanjay-server" {
+resource "aws_instance" "arun-server" {
   ami             = "ami-05ffe3c48a9991133"
   subnet_id       = aws_subnet.public-subnet.id
   instance_type   = "t2.micro"
   security_groups = ["${aws_security_group.test_access.id}"]
-  key_name        = "nithya-key"
+  key_name        = "current-key"
   tags = {
     Name     = "test-World"
     Stage    = "testing"
@@ -640,13 +640,13 @@ resource "aws_instance" "sanjay-server" {
  
  
 ##create an EIP for EC2
-resource "aws_eip" "sanjay-ec2-eip" {
-  instance = aws_instance.sanjay-server.id
+resource "aws_eip" "arun-ec2-eip" {
+  instance = aws_instance.arun-server.id
 }
  
 #ssh keypair code
 resource "aws_key_pair" "ltimindtree" {
-  key_name   = "nithya-new-key"
+  key_name   = "arun-new-key"
   public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCvlb/dvHqB2JMM5s43uWgYsRlUz6eiEz6dX6JvLEZhrN1QbjSyfdsk8bagpohjxLhc2Y0nCD6RjsH5IuuMOEJ05h/KvKI539wEohH7irY7nefho3aVUUPmVlXeytSslIzpOX9CjM/Q4jQbxLMG7AgEEDRZwPyT3fQ3Z0iegKdkwO2R0S5hsyiGFL3gJmMfSn5Oumi20xtiik6L2pHjjN4xk8ozRYMJFVdBAq5a8OiKztqpCDKRMBOAPv46blzLFe5UES4TLIFEaMWXcLhVbdkkqpIO4l6DNq/0FkjR0tYJxghcy/M8TgZ0qqvQhtOQJxmsDL+DCWWZvjuEWJ6Fp8Sbqblo0iBE7DDW0icL+T++qQmjPAs5ODHMUeB67CUEdtFSUVFmhSaI19KpAVpzprbgxXYuFE+hS2bzFThpQriKBDJ6EytQXvRLy7zFigdC78VjQrUJap/JrKpGs1Xdrzqbebcv0N5cCgwivPLlnNimBHEx6AGWKwGucDKGPSVN5L8= root@terraform.example.com"
 }
  
@@ -656,7 +656,7 @@ resource "aws_instance" "database-server" {
   subnet_id       = aws_subnet.private-subnet.id
   instance_type   = "t2.micro"
   security_groups = ["${aws_security_group.test_access.id}"]
-  key_name        = "nithya-new-key"
+  key_name        = "arun-new-key"
   tags = {
     Name     = "db-World"
     Stage    = "stage-base"
