@@ -512,10 +512,6 @@ spec:
    12  cat credentials
    13  cd
    14  mkdir terra
-   15  cd terra/
-   16  ll
-   17  vim ec2-vpc.tf
-   18  cd
    19  ssh-keygen
    20  cd .ssh/
    21  ll
@@ -760,7 +756,7 @@ resource "aws_instance" "custom-server" {
   }
 }
 ===========================================================================================================================
---------load balancer
+--------load balancer------------
 create three instances in three different zones 1a,1b,1c
  yum install httpd -y
     2  hostnamectl set-hostname two
@@ -774,4 +770,31 @@ create three instances in three different zones 1a,1b,1c
 do this in all the three
 next go to aws>>target group >> add these to pending>> add to target group
 next load balancer >> create new >> application >> choose the zones, choose targetgroup >> create it and wait for active then copy the dns url,paste in google refresh then the url changes
+=========================================================================================================================
+----------- image in terraform------------
+ sudo dnf install -y dnf-plugins-core
+    2  sudo dnf config-manager --add-repo https://rpm.releases.hashicorp.com/AmazonLinux/hashicorp.repo
+    3  sudo dnf -y install terraform
+    4  terraform -v
+    5  curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+    6  unzip awscliv2.zip
+    7  sudo ./aws/install
+    8  aws configure
+    9  cd .aws/
+   10  ll
+   11  cat config
+   12  cat credentials
+   13  cd
+   14  mkdir terra-image
+   vim image.tf
+   ami image has been created in the aws
+-------------------------------------------------------------
+   resource "aws_ami_from_instance" "my-images" {
+  name               = "terim"
+  source_instance_id = "i-031197f903dc9b37d"
+  tags = {
+    Name = "Hello-world"
+  }
+}
+================================================================================================================
 
