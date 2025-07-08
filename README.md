@@ -370,7 +370,11 @@ sudo su -
    37  cd /mnt
    38  vim sp.txt
    39  ll
-=================================nginx
+
+
+
+   
+==================================  nginx  =========================
 yum install nginx -y
 systemctl start nginx.service
 systemctl status nginx.service
@@ -381,12 +385,12 @@ docker pull nginx:stable-perl
 docker images
 docker run -itd --name MyBrowser -p 8080:8080 nginx /bin/bash
 docker ps -a
-docker attach img id
+docker attach #img id
 curl http://localhost
 copy the ip and paste in the url
 
 
-=================================ansible
+=================================ansible============================================
                                 controller
  passwd root
     2  ip a s
@@ -399,7 +403,7 @@ copy the ip and paste in the url
    11  ll -d /etc/ansible/
    12  ll
    13  vim ansible.cfg
-   cpy paste from github
+   cpy paste from 458
    14  ansible --version
    15  ping ans-one.example.com
    16  ssh-keygen
@@ -412,13 +416,215 @@ copy the ip and paste in the url
    33  mkdir project-x
    34  cd project-x/
    35  vim simple-playbook.yaml
-   cpy from teams bala
+   cpy from teams 422
    37  ansible-playbook simple-playbook.yaml --syntax-check
    39  cat > index.html
    40  ansible-playbook simple-playbook.yaml
 
    check in browser with ip of node ip
+---------------------------------------------------------------------------
+- name: This is a simple playbook
+  hosts: all
+  tasks:
+    - name: Installed Apache
+      yum:
+        name: httpd
+        state: present
+ 
+- name: Started Apache service
+  hosts: all
+  tasks:
+    - name: Start and enable Apache
+      systemd:
+        name: httpd
+        state: started
+        enabled: true
+ 
+- name: Configure basic Apache
+  hosts: all
+  tasks:
+    - name: Installed httpd
+      dnf:
+        name: httpd
+        state: latest
+ 
+    - name: Copied index.html
+      copy:
+        src: index.html
+        dest: /var/www/html/index.html
+ 
+    - name: Started httpd
+      systemd:
+        name: httpd
+        state: started
+        enabled: true
+      ----------------------------
+  # config file for ansible -- http://ansible.com/
+# ==============================================
 
+# nearly all parameters can be overridden in ansible-playbook 
+# or with command line flags. ansible will read ANSIBLE_CONFIG,
+# ansible.cfg in the current working directory, .ansible.cfg in
+# the home directory or /etc/ansible/ansible.cfg, whichever it
+# finds first
+
+[defaults]
+
+# some basic default values...
+
+hostfile       = /etc/ansible/hosts
+library        = /usr/share/ansible
+remote_tmp     = $HOME/.ansible/tmp
+pattern        = *
+forks          = 5
+poll_interval  = 15
+sudo_user      = root
+#ask_sudo_pass = True
+#ask_pass      = True
+transport      = smart
+remote_port    = 22
+
+# additional paths to search for roles in, colon seperated
+#roles_path    = /etc/ansible/roles
+
+# uncomment this to disable SSH key host checking
+#host_key_checking = False
+
+# change this for alternative sudo implementations
+sudo_exe = sudo
+
+# what flags to pass to sudo
+#sudo_flags = -H
+
+# SSH timeout
+timeout = 10
+
+# default user to use for playbooks if user is not specified
+# (/usr/bin/ansible will use current user as default)
+#remote_user = root
+
+# logging is off by default unless this path is defined
+# if so defined, consider logrotate
+#log_path = /var/log/ansible.log
+
+# default module name for /usr/bin/ansible
+#module_name = command
+
+# use this shell for commands executed under sudo
+# you may need to change this to bin/bash in rare instances
+# if sudo is constrained
+#executable = /bin/sh
+
+# if inventory variables overlap, does the higher precedence one win
+# or are hash values merged together?  The default is 'replace' but
+# this can also be set to 'merge'.
+#hash_behaviour = replace
+
+# How to handle variable replacement - as of 1.2, Jinja2 variable syntax is
+# preferred, but we still support the old $variable replacement too.
+# Turn off ${old_style} variables here if you like.
+#legacy_playbook_variables = yes
+
+# list any Jinja2 extensions to enable here:
+#jinja2_extensions = jinja2.ext.do,jinja2.ext.i18n
+
+# if set, always use this private key file for authentication, same as 
+# if passing --private-key to ansible or ansible-playbook
+#private_key_file = /path/to/file
+
+# format of string {{ ansible_managed }} available within Jinja2 
+# templates indicates to users editing templates files will be replaced.
+# replacing {file}, {host} and {uid} and strftime codes with proper values.
+ansible_managed = Ansible managed: {file} modified on %Y-%m-%d %H:%M:%S by {uid} on {host}
+
+# by default, ansible-playbook will display "Skipping [host]" if it determines a task
+# should not be run on a host.  Set this to "False" if you don't want to see these "Skipping" 
+# messages. NOTE: the task header will still be shown regardless of whether or not the 
+# task is skipped.
+#display_skipped_hosts = True
+
+# by default (as of 1.3), Ansible will raise errors when attempting to dereference 
+# Jinja2 variables that are not set in templates or action lines. Uncomment this line
+# to revert the behavior to pre-1.3.
+#error_on_undefined_vars = False
+
+# set plugin path directories here, seperate with colons
+action_plugins     = /usr/share/ansible_plugins/action_plugins
+callback_plugins   = /usr/share/ansible_plugins/callback_plugins
+connection_plugins = /usr/share/ansible_plugins/connection_plugins
+lookup_plugins     = /usr/share/ansible_plugins/lookup_plugins
+vars_plugins       = /usr/share/ansible_plugins/vars_plugins
+filter_plugins     = /usr/share/ansible_plugins/filter_plugins
+
+# don't like cows?  that's unfortunate.
+# set to 1 if you don't want cowsay support or export ANSIBLE_NOCOWS=1 
+#nocows = 1
+
+# don't like colors either?
+# set to 1 if you don't want colors, or export ANSIBLE_NOCOLOR=1
+#nocolor = 1
+
+# the CA certificate path used for validating SSL certs. This path 
+# should exist on the controlling node, not the target nodes
+# common locations:
+# RHEL/CentOS: /etc/pki/tls/certs/ca-bundle.crt
+# Fedora     : /etc/pki/ca-trust/extracted/pem/tls-ca-bundle.pem
+# Ubuntu     : /usr/share/ca-certificates/cacert.org/cacert.org.crt
+#ca_file_path = 
+
+# the http user-agent string to use when fetching urls. Some web server
+# operators block the default urllib user agent as it is frequently used
+# by malicious attacks/scripts, so we set it to something unique to 
+# avoid issues.
+#http_user_agent = ansible-agent
+
+[paramiko_connection]
+
+# uncomment this line to cause the paramiko connection plugin to not record new host
+# keys encountered.  Increases performance on new host additions.  Setting works independently of the
+# host key checking setting above.
+#record_host_keys=False
+
+# by default, Ansible requests a pseudo-terminal for commands executed under sudo. Uncomment this
+# line to disable this behaviour.
+#pty=False
+
+[ssh_connection]
+
+# ssh arguments to use
+# Leaving off ControlPersist will result in poor performance, so use 
+# paramiko on older platforms rather than removing it
+#ssh_args = -o ControlMaster=auto -o ControlPersist=60s
+
+# The path to use for the ControlPath sockets. This defaults to
+# "%(directory)s/ansible-ssh-%%h-%%p-%%r", however on some systems with
+# very long hostnames or very long path names (caused by long user names or 
+# deeply nested home directories) this can exceed the character limit on
+# file socket names (108 characters for most platforms). In that case, you 
+# may wish to shorten the string below.
+# 
+# Example: 
+# control_path = %(directory)s/%%h-%%r
+#control_path = %(directory)s/ansible-ssh-%%h-%%p-%%r
+
+# Enabling pipelining reduces the number of SSH operations required to 
+# execute a module on the remote server. This can result in a significant 
+# performance improvement when enabled, however when using "sudo:" you must 
+# first disable 'requiretty' in /etc/sudoers
+#
+# By default, this option is disabled to preserve compatibility with
+# sudoers configurations that have requiretty (the default on many distros).
+# 
+#pipelining = False
+
+# if True, make ansible use scp if the connection type is ssh 
+# (default is sftp)
+#scp_if_ssh = True
+
+[accelerate]
+accelerate_port = 5099
+accelerate_timeout = 30
+accelerate_connect_timeout = 5.0
    =====================worker=======================
 
     1  passwd root
