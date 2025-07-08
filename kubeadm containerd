@@ -1,0 +1,120 @@
+-> create EC2 instance control plane (ubuntu, medium, 15gb)
+-> ec2 node one (ubuntu, micro, 10gb)
+-> ec2 node two (ubuntu, micro, 10gb)
+********************
+control plane:
+-> sudo su -
+-> hostnamectl set-hostname controller.example.com
+-> bash
+********************
+node - one:
+-> sudo su -
+-> hostnamectl set-hostname node-one.example.com
+-> bash
+********************
+node - two:
+-> sudo su -
+-> hostnamectl set-hostname node-two.example.com
+-> bash
+********************
+All nodes :
+vim /etc/hosts
+(ip)    (hostname)
+********************
+node one & node two 
+vim /etc/ssh/sshd_config
+- permitrootlogin yes
+- passwordauthentication yes
+-> systemctl restart ssh
+-> systemctl enable ssh
+********************
+ssh-keygen
+(connect all )
+********************
+Control-plane:
+#apt update -y
+#apt install containerd -y
+#systemctl start containerd
+#systemctl enable containerd
+#sudo modprobe overlay
+#sudo modprobe br_netfilter
+#
+cat <<EOF | sudo tee /etc/modules-load.d/kubernetes.conf
+br_netfilter
+ip_vs
+ip_vs_rr
+ip_vs_wrr
+ip_vs_sh
+overlay
+EOF
+#
+cat > /etc/sysctl.d/kubernetes.conf << EOF
+net.ipv4.ip_forward = 1
+net.bridge.bridge-nf-call-ip6tables = 1
+net.bridge.bridge-nf-call-iptables = 1
+EOF
+#sysctl --system
+#mkdir -p /etc/containerd
+#containerd config default | sudo tee /etc/containerd/config.toml
+#vim /etc/containerd/config.toml   (139) true
+#systemctl restart containerd
+#sudo apt-get update
+#sudo apt-get install -y apt-transport-https ca-certificates curl gpg
+#curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.32/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+#echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.32/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
+#sudo apt-get update
+#sudo apt-get install -y kubelet kubeadm kubectl
+#sudo systemctl enable --now kubelet
+#kubeadm config images pull
+#kubeadm init
+(paste  3 comments) (token - 1)
+(#mkdir -p $HOME/.kube
+ #sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+ #sudo chown $(id -u):$(id -g) $HOME/.kube/configconfigure Pod Network)
+#kubectl get nodes
+
+
+********************
+node one and two:
+#apt update -y
+#apt install containerd -y
+#systemctl start containerd
+#systemctl enable containerd
+#sudo modprobe overlay
+#sudo modprobe br_netfilter
+#
+cat <<EOF | sudo tee /etc/modules-load.d/kubernetes.conf
+br_netfilter
+ip_vs
+ip_vs_rr
+ip_vs_wrr
+ip_vs_sh
+overlay
+EOF
+#
+cat > /etc/sysctl.d/kubernetes.conf << EOF
+net.ipv4.ip_forward = 1
+net.bridge.bridge-nf-call-ip6tables = 1
+net.bridge.bridge-nf-call-iptables = 1
+EOF
+#sysctl --system
+#mkdir -p /etc/containerd
+#containerd config default | sudo tee /etc/containerd/config.toml
+#vim /etc/containerd/config.toml   (139) true
+#systemctl restart containerd
+#sudo apt-get update
+#sudo apt-get install -y apt-transport-https ca-certificates curl gpg
+#curl -fsSL https://pkgs.k8s.io/core:/stable:/v1.32/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+#echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.32/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
+#sudo apt-get update
+#sudo apt-get install -y kubelet kubeadm kubectl
+#sudo systemctl enable --now kubelet
+
+(paste token)
+
+********************************
+control plane:
+#curl https://raw.githubusercontent.com/projectcalico/calico/v3.29.2/manifests/calico.yaml -O
+#kubectl apply -f calico.yaml
+********************************
+get ready
