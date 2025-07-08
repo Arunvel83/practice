@@ -1,0 +1,24 @@
+create ec2
+ssh-keygen
+connect with control plane
+vim /etc/ssh/sshd_config
+(2 settings)
+restart enable sshd
+#yum install -y openssh-server
+#mkdir .kube 
+control plane:
+#scp /etc/kubernetes/admin.conf username@local_server:/root/.kube
+local 
+#export KUBECONFIG=~/.kube/admin.conf
+
+curl -LO "https://dl.k8s.io/release/$(curl -sL https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+chmod +x kubectl
+sudo mv kubectl /usr/local/bin/
+kubectl version --client
+which kubectl
+export PATH=/usr/local/bin:$/usr/local/bin/kubectl
+kubectl version --client
+
+kubectl config view
+
+kubectl get nodes
