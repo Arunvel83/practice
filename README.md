@@ -760,4 +760,18 @@ resource "aws_instance" "custom-server" {
   }
 }
 ===========================================================================================================================
-   
+--------load balancer
+create three instances in three different zones 1a,1b,1c
+ yum install httpd -y
+    2  hostnamectl set-hostname two
+    3  bash
+    4  cd /var/www/html/
+    5  echo "this is one" > index.html
+    6  echo "this is two" > index.html
+    7  cd
+    8  systemctl restart httpd
+    9  systemctl enable httpd
+do this in all the three
+next go to aws>>target group >> add these to pending>> add to target group
+next load balancer >> create new >> application >> choose the zones, choose targetgroup >> create it and wait for active then copy the dns url,paste in google refresh then the url changes
+
