@@ -1,0 +1,153 @@
+#############################################################################################################################
+ansible ec2 with sg 80,443
+###################Master_node#######################
+yum install ansible*
+ip a s
+vim /etc/hosts
+vim /etc/ssh/sshd_config
+systemctl start sshd
+systemctl enable sshd
+ssh-keygen
+cd /etc/ansible
+vim hosts
+vim simple.yaml
+###############
+---
+- name: This is a sample playbook
+  hosts: all
+
+  tasks:
+    - name: Installing Apache
+      yum:
+        name: httpd
+        state: present
+
+    - name: Copy fstab
+      copy:
+        src: /etc/fstab
+        dest: /tmp/fstab
+
+    - name: Start and enable httpd
+      systemd:
+        name: httpd
+        state: started
+        enabled: true
+...
+ansible-playbook simple.yaml
+
+###############---workernode---#################
+
+ip a s
+vim /etc/hosts
+vim /etc/ssh/sshd_config
+systemctl start sshd
+systemctl enable sshd
+hostname
+cd .ssh/
+ll
+vim authorized_keys
+cd /tmp
+ll
+cd
+rpmquery httpd
+##################################################################################################
+ansible to add multiple user
+############################
+ vim adduser.yaml
+ --------
+ ---
+- name: create multiple users
+  hosts: all
+  tasks:
+    - name: create multiple users
+      user:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - nav
+        - pav
+        - nith
+        - arun
+############################
+ansible to add multiple files
+############################
+vim copied.yaml
+---------------
+---
+- name: copy files
+  hosts: all
+  tasks:
+    - name: copy files
+      copy:
+        src: "{{ item }}"
+        dest: /tmp
+      loop:
+        - /etc/group
+        - /etc/fstab
+        - /etc/passwd
+        - /etc/shadow
+############################
+######################-terraform ec2 with 443,80-##########################
+
+https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli
+
+->  1  sudo dnf install -y dnf-plugins-core
+    2  sudo dnf config-manager --add-repo https://rpm.releases.hashicorp.com/AmazonLinux/hashicorp.repo
+    3  sudo dnf -y install terraform
+    4  terraform -v
+    5  curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+    6  unzip awscliv2.zip
+    7  sudo ./aws/install
+    8  aws configure
+    9  mkdir terraform
+   10  cd terraform/
+   11  vim ec2-instance.tf
+   12  terraform init
+   13  terraform fmt
+   14  terraform validate
+   15  terraform plan
+   16  terraform apply
+------------------------------------------------------------
+
+resource "aws_security_group" "terra_sg" {
+  name        = "terra_sg"
+  description = "Allow traffic"
+  tags = {
+    Name = "terra_sg"
+  }
+}
+resource "aws_vpc_security_group_ingress_rule" "allow_http" {
+  security_group_id = aws_security_group.terra_sg.id
+  cidr_ipv4         = "0.0.0.0/0"
+  from_port         = 80
+  ip_protocol       = "tcp"
+  to_port           = 80
+}
+resource "aws_vpc_security_group_ingress_rule" "allow_https" {
+  security_group_id = aws_security_group.terra_sg.id
+  cidr_ipv4         = "0.0.0.0/0"
+  from_port         = 443
+  ip_protocol       = "tcp"
+  to_port           = 443
+}
+#ec2 instance code starts here
+resource "aws_instance" "custom-server" {
+  ami               = "ami-05ffe3c48a9991133"
+  availability_zone = "us-east-1a"
+  instance_type     = "t2.micro"
+  security_groups   = ["${aws_security_group.terra_sg.name}"]
+  key_name          = "terra-key"
+
+  user_data = <<-EOF
+        #!/bin/bash
+        sudo yum install httpd -y
+        sudo systemctl start httpd
+        sudo systemctl enable httpd
+        echo "<h1> Hi this is arun, this is my web server with security group</h1>" | sudo tee /var/www/html/index.html
+  EOF
+  tags = {
+    Name     = "new-instance"
+    Stage    = "testing"
+    Location = "mumbai"
+  }
+}
