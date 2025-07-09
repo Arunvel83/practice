@@ -237,3 +237,56 @@ yum install ansible*
    31  ansible-playbook ec2.yaml --syntax-check
    32  ansible-playbook ec2.yaml -C
    33  ansible-playbook ec2.yaml
+##################################################################
+github actions
+#####################
+-Create a new public repo
+-Create index.html in the newly created public repo
+-Create s3 bucket 
+  enable ACLs 
+-add bucket policy :- click on bucket -> permissions -> bucket policy -> edit -> paste the below code in the box
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "PublicReadForGetBucketObjects",
+            "Effect": "Allow",
+            "Principal": "*",
+            "Action": "s3:GetObject",
+            "Resource": "arn:aws:s3:::mansi-2610/*"
+        }
+    ]
+}
+-enable static web hosting for the bucket
+-Set up GitHub Secrets for AWS credentials
+  go to -> settings -> secrets & variables -> actions -> new repository secret
+        AWS_ACCESS_KEY_ID : access key
+        AWS_SECRET_ACCESS_KEY : secret key
+-Create the GitHub Actions workflow
+-create new file in this loction :- .github/workflows/main.yml
+name: Deploy to AWS S3
+on:
+  push:
+    branches:
+      - main
+ 
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+ 
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v1
+ 
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+ 
+      - name: Deploy static site to S3 bucket
+        run: aws s3 sync . s3://mansi-2610 --delete
+-then go to actions -> deploy workflow will run automatically 
+-copy the s3 bucket url and access the index.html file from the browser
+-make changes the index.html and see wheather changes are reflecting or not
