@@ -151,3 +151,27 @@ resource "aws_instance" "custom-server" {
     Location = "mumbai"
   }
 }
+#################################################
+docker ubuntu
+###################
+yum install docker*
+systemctl enable docker
+systemctl start docker
+systemctl status docker
+docker pull ubuntu
+docker pull httpd
+docker ps -a
+docker run -it --name web -p 8081:80 ubuntu /bin/bash
+apt update -y
+apt install apache2 -y
+cd /var/www/html
+cat > index.html 
+->hi..hellooo
+press ctrl+d
+service apache2 start
+cd
+ctrl+p+Q
+docker ps -a
+docker inspect web | less (inside the docker copy the ip and use it with curl)
+curl http://(ip)
+copy and paste the public_ip of instance and run with with specified port at the code to as 8081 with enabled in security group.
