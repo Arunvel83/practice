@@ -1,5 +1,5 @@
 #############################################################################################################################
-ansible ec2 with sg 80,443
+ansible httpd fstab
 ###################Master_node#######################
 yum install ansible*
 ip a s
@@ -175,3 +175,65 @@ docker ps -a
 docker inspect web | less (inside the docker copy the ip and use it with curl)
 curl http://(ip)
 copy and paste the public_ip of instance and run with with specified port at the code to as 8081 with enabled in security group.
+###############################################################################################################################
+create ec2 instance using ansible
+#################################
+yum install ansible*
+    1  ansible --version
+    2  mkdir -p /etc/ansible
+    3  cd /etc/ansible
+    4  vim ansible.cfg
+    5  ansible-galaxy collection install amazon.aws
+    6  ansible-galaxy collection install amazon.aws --force
+    7  yum install pip*
+    8  yum install python*
+    9  yum install python* --allowerasing --skip-broken
+   10  yum install ansible*
+   11  hostnamectl set-hostname ansible.example.com
+   12  bash
+   13  pip install boto
+   17  vim hosts
+******************************************
+   [localhost]
+   localhost
+   localhost ansible_connection=local ansible_python_interpreter=/usr/bin/python3
+********************************************
+   18  cd
+   19  ssh-keygen
+   20  ansible localhost --list-host
+   21  curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+   22  unzip awscliv2.zip
+   23  sudo ./aws/install
+   24  aws configure
+   25  cd /etc/ansible
+   26  vim creds.yaml
+***************************************
+   aws_access_key : my access key
+   aws_secret_access_key : my secret key
+***************************************
+   27  ll
+   28  vim ec2.yaml
+**********************************
+---
+- name: creating ec2 instance
+  hosts: localhost
+  vars_files:
+ 
+      - creds.yaml
+  tasks:
+        - name: creating Ec2 instance via Ansible
+          amazon.aws.ec2_instance:
+            name: k8s-master
+            instance_type: t2.medium
+            image_id: (ami id)
+            vpc_subnet_id: (my-subnet id)
+            security_group: (our sg)
+            key_name: (my-key)
+            region: us-east-1
+            count: 1
+            state: present
+*****************************************************************
+ 
+   31  ansible-playbook ec2.yaml --syntax-check
+   32  ansible-playbook ec2.yaml -C
+   33  ansible-playbook ec2.yaml
