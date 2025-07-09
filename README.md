@@ -997,7 +997,7 @@ next load balancer >> create new >> application >> choose the zones, choose targ
 -------------------------------------------------------------
    resource "aws_ami_from_instance" "my-images" {
   name               = "terim"
-  source_instance_id = "i-031197f903dc9b37d"
+  source_instance_id = "(our instance id)"
   tags = {
     Name = "Hello-world"
   }
