@@ -1,0 +1,71 @@
+-------jenkins t2.medium 12gb
+
+sudo su -
+hostnamectl set-hostname jenkins.example.com
+bash
+sudo yum update –y
+sudo wget -O /etc/yum.repos.d/jenkins.repo \
+    https://pkg.jenkins.io/redhat-stable/jenkins.repo
+    
+sudo rpm --import https://pkg.jenkins.io/redhat-stable/jenkins.io-2023.key
+sudo yum upgrade
+sudo yum install java-17-amazon-corretto -y
+sudo yum install jenkins -y
+sudo systemctl enable jenkins
+sudo systemctl start jenkins
+sudo systemctl status jenkins
+-open jenkins with the ip from instance need pass copy command
+cat / paste command
+-copy the password and login
+-token from profile save token -rep webhook
+-plugin install
+yum install maven
+yum install git -y
+git init
+mvn -v 
+-cpy path and paste in jdk
+new item maven
+git url /main
+-build
+------------docker
+ yum install docker*
+ ssh-keygen                                                                  install plugin publish over ssh
+ vim .ssh/authorized_keys (generate key from Jenkins and paste here)                   ---jenkins--
+ cat /root/.ssh/id_rsa.pub(cpy and paste in Jenkins authrorized keys)                  parallely
+ passwd root                                                                           same 
+ vim /etc/ssh/sshd_config(do this in both doker,jenkins)                               same
+ systemctl restart sshd                                                                
+ systemctl enable sshd              jen--rsync -avh /var/lib/jenkins/workspace/project* root@172.31.7.132:/opt
+ ip a s                                                         
+ cd /opt
+ ll
+ cd project/
+ ll
+--create an ecr in aws cpy paste the 4 push commands
+aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 462295791132.dkr.ecr.us-east-1.amazonaws.com
+docker build -t my-image .
+---if not working
+-systemctl start docker
+-systemctl enable docker
+docker build -t my-image .
+docker tag my-image:latest 462295791132.dkr.ecr.us-east-1.amazonaws.com/my-image:latest
+docker push 462295791132.dkr.ecr.us-east-1.amazonaws.com/my-image:latest
+-------------eks---
+ yum update -y
+ curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp
+
+ sudo mv /tmp/eksctl /usr/local/bin
+ eksctl version
+ curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
+
+ sudo install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+ kubectl version --client
+ ssh-keygen
+ eksctl create cluster --name arunvel-project --region us-east-1 --version 1.32 --node-type t2.small --nodes 3 --nodes-min 2 --nodes-max 4 --ssh-access --ssh-public-key /root/.ssh/id_rsa.pub
+
+ vim regapp-deploy.yml
+ vim regapp-service.yml
+ kubectl apply -f regapp-deploy.yml
+ kubectl apply -f regapp-service.yml
+ kubectl get pods
+ kubectl get svc
